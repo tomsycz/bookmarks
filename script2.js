@@ -6,7 +6,7 @@ const websiteNameEl = document.getElementById("website-name");
 const websiteUrlEl = document.getElementById("website-url");
 const bookmarksContainer = document.getElementById("bookmarks-container");
 
-let bookmarks = [];
+let bookmarks = {};
 
 // Show Modal, Focus on Input
 
@@ -46,9 +46,8 @@ function buildBookmarks() {
   // Remove all bookmark elements
   bookmarksContainer.textContent = "";
   // Build Items
-  bookmarks.forEach(bookmark => {
-    const { name, url } = bookmark;
-    console.log(name, url);
+  Object.keys(bookmarks).forEach(id => {
+    const { name, url } = bookmarks[id];
     // Item
     const item = document.createElement("div");
     item.classList.add("item");
@@ -88,18 +87,16 @@ function fetchBookmarks() {
   }
   // Create Bookmarks array in localStorage
   else {
-    bookmarks = [{ name: "Github", url: "https://github.com" }];
+    bookmarks = {
+      "https://github.com": { name: "Github", url: "https://github.com" },
+    };
     localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
   }
   buildBookmarks();
 }
 // Delete Bookmark
 function deleteBookmark(url) {
-  bookmarks.forEach((bookmark, i) => {
-    if (bookmark.url === url) {
-      bookmarks.splice(i, 1);
-    }
-  });
+  delete bookmarks[url];
   // Update bookmarks array in local storage, re-populate DOM
   localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
   fetchBookmarks();
@@ -121,7 +118,7 @@ function storeBookmark(e) {
     name: nameValue,
     url: urlValue,
   };
-  bookmarks.push(bookmark);
+  bookmarks[urlValue] = bookmark;
   localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
   fetchBookmarks();
   bookmarkForm.reset();
